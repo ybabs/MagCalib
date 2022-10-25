@@ -6,6 +6,7 @@
 #include <string>
 using Eigen::EigenBase;   
 
+const double PI = std::atan(1.0)*4;
 
 template <typename Derived>
 std::string get_shape(const EigenBase<Derived>& x)
@@ -21,8 +22,7 @@ public:
     explicit Mag() = default;
     ~Mag();
     void processFile();
-    void fitEllipsoid(Eigen::VectorXd& magX, Eigen::VectorXd&  magY, Eigen::VectorXd&  magZ );
-    void computeError();
+    void fitEllipsoid(Eigen::VectorXd& magX, Eigen::VectorXd&  magY, Eigen::VectorXd&  magZ );    void computeError();
 
    private:
    std::ifstream inputFile;
@@ -32,5 +32,6 @@ public:
    Eigen::VectorXd mag_y;
    Eigen::VectorXd mag_z;
    double d;
+
 
 };

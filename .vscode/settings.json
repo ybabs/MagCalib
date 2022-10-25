@@ -58,7 +58,8 @@
         "cinttypes": "cpp",
         "typeinfo": "cpp",
         "list": "cpp",
-        "matrixfunctions": "cpp"
+        "matrixfunctions": "cpp",
+        "optional": "cpp"
     },
     "cmake.configureOnOpen": true
 }

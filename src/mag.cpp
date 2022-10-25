@@ -1,7 +1,7 @@
 #include <mag.hpp>
 #include <algorithm>
 #include <cmath>
-// #include <matplot/matplot.h>
+#include <matplot/matplot.h>
 #include <Eigen/Eigenvalues>
 #include <Spectra/GenEigsSolver.h>
 #include <unsupported/Eigen/MatrixFunctions>
@@ -9,7 +9,7 @@
 
 using namespace Spectra;
 
-// using namespace matplot;
+using namespace matplot;
 
 Mag::~Mag()
 {
@@ -244,16 +244,70 @@ void Mag::computeError()
 
     }
 
- 
    // copy vectors back
-   std::vector<float> x(&calibX[0], calibX.data()+calibX.cols()*calibX.rows());
-   std::vector<float> y(&calibY[0], calibY.data()+calibY.cols()*calibY.rows());
-   std::vector<float> z(&calibZ[0], calibZ.data()+calibZ.cols()*calibZ.rows());
+   std::vector<double> x_cal(&calibX[0], calibX.data()+calibX.cols()*calibX.rows());
+   std::vector<double> y_cal(&calibY[0], calibY.data()+calibY.cols()*calibY.rows());
+   std::vector<double> z_cal(&calibZ[0], calibZ.data()+calibZ.cols()*calibZ.rows());
 
-    // auto l = plot3(x, y, z);
-    // show();
+   Eigen::VectorXd u = Eigen::VectorXd::LinSpaced(100, 0, 2*PI);
+   Eigen::VectorXd v = u.replicate(1, 1) / 2;
+   Eigen::VectorXd cos_u = Eigen::ArrayXd::LinSpaced(100, 0, 2*PI).cos();
+   Eigen::VectorXd cos_v = Eigen::ArrayXd::LinSpaced(100, 0, PI).cos();
+   Eigen::VectorXd sin_u = Eigen::ArrayXd::LinSpaced(100, 0, 2*PI).sin();
+   Eigen::VectorXd sin_v = Eigen::ArrayXd::LinSpaced(100, 0, 2*PI).sin();
 
-    //plt::scatter(calibX, calibY, calibZ, {{"color", "red"}, {"label", "a circle!"}});
+   Eigen::MatrixXd x = cos_u * sin_v.transpose();
+   Eigen::MatrixXd y = sin_u * sin_v.transpose();
+   Eigen::MatrixXd z = Eigen::VectorXd::Ones(u.size())* cos_v.transpose();
+
+   std::vector<std::vector<double>> casted_x(x.rows(), std::vector<double>(x.cols(), 0));
+   std::vector<std::vector<double>> casted_y(y.rows(), std::vector<double>(y.cols(), 0));
+   std::vector<std::vector<double>> casted_z(z.rows(), std::vector<double>(z.cols(), 0));
+
+   for(int col = 0; col < x.cols(); ++col)
+   {
+        for(int row = 0; row < x.rows(); ++row)
+        { 
+            casted_x.at(row).at(col) = x(row, col); 
+        }
+   }
+
+    for(int col = 0; col < y.cols(); ++col)
+   {
+        for(int row = 0; row < y.rows(); ++row)
+        { 
+            casted_y.at(row).at(col) = y(row, col); 
+        }
+   }
+
+   double mx = *std::max_element(std::begin(casted_x[0]), std::end(casted_x[100-1]));
+std::cout << "Max X" << mx << std::endl;
+    for(int col = 0; col < z.cols(); ++col)
+   {
+        for(int row = 0; row < z.rows(); ++row)
+        { 
+            casted_z.at(row).at(col) = z(row, col); 
+        }
+   }
+
+      double my = *std::max_element(std::begin(casted_y[0]), std::end(casted_y[100-1]));
+     std::cout << "Max X" << my << std::endl;
+
+
+      double mz = *std::max_element(std::begin(casted_z[0]), std::end(casted_z[100-1]));
+     std::cout << "Max X" << mz << std::endl;
+    // for(int col = 0; col < x.cols(); ++col)
+    // {   std::cout<<"This is the "<<col+1<< " column"<<std::endl;
+    //     for(int row = 0; row < x.rows(); ++row)
+    //     {
+            
+    //         std::cout<<casted_x.at(row).at(col)<<std::endl;
+            
+    //     }   
+    // }
+
+   auto l = fplot3(casted_x, casted_y, casted_z, x_cal, y_cal, z_cal);
+   show();
 
     std::cout<< "Error: " <<totalError << std::endl;
     
